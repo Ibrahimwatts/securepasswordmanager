@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Passwords</h1>
+    <form action="/generate_password" method="POST">
+        <button type="submit">Generate New Password</button>
+    </form>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Password</th>
+            <th>Request Time</th>
+            <th>Reveal Timer</th>
+            <th>Remaining Time</th>
+            <th>Actions</th>
+        </tr>
+        {% for password in passwords %}
+        <tr>
+            <td>{{ password.id }}</td>
+            <td>
+                {% if password.is_revealed %}
+                    {{ password.password_value }}
+                {% else %}
+                    Hidden
+                {% endif %}
+            </td>
+            <td>{{ password.requested_at }}</td>
+            <td>{{ password.revealed_at if password.revealed_at else "Not revealed yet" }}</td>
+            <td>{{ password.remaining_time }}</td>
+            <td>
+                {% if not password.is_revealed %}
+                    <form method="post" action="/request_reveal/{{ password.id }}" style="display:inline;">
+                        <button type="submit">Request Reveal</button>
+                    </form>
+                {% endif %}
+                <form action="/cancel_reveal/{{ password.id }}" method="POST" style="display:inline;">
+                    <button type="submit">Cancel Reveal</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/logout"><button>Logout</button></a>
+</body>
+</html>
